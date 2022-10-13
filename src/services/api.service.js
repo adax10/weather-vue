@@ -16,7 +16,7 @@ const createAxiosInstance = (baseURL) => {
   return newInstance;
 };
 
-const ApiWeatherService = createAxiosInstance(`${process.env.VUE_APP_WEATHER_API}`);
-const GeoApiService = createAxiosInstance(`${process.env.VUE_APP_GEO_API}`);
+const weatherApiService = createAxiosInstance(`${process.env.VUE_APP_WEATHER_API}`);
+const geoApiService = createAxiosInstance(`${process.env.VUE_APP_GEO_API}`);
 
-export { ApiWeatherService, GeoApiService };
+export { weatherApiService, geoApiService };
