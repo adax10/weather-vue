@@ -7,66 +7,102 @@
       <v-text-field
         class="weather-search__form-input"
         v-model="location"
-        :rules="weatherInputRules"
+        :rules="[(v) => !!v || 'Required', (v) => /^[a-zA-Z\s]*$/.test(v) || 'Please enter only lettters']"
         variant="underlined"
       ></v-text-field>
-      <div class="weather-search__form-button"><v-btn :disabled="!valid" color="primary" @click="submit">Search</v-btn></div>
+      <div class="weather-search__form-button">
+        <v-btn :disabled="!valid" color="primary" @click="searchWeather">Search</v-btn>
+      </div>
     </v-form>
   </v-card>
 
-  <div v-if="loaded" class="weather-result">
+  <div v-if="loadingData" class="weather-loader">
+    <v-progress-circular :width="10" :size="100" :model-value="loadingValue" color="primary" />
+  </div>
+
+  <div v-if="loadedData" class="weather-result">
     <weather-card class="weather-result__current" :weather="weatherData" />
-    <forecast-card class="weather-result__forecast" />
+    <forecast-wrapper class="weather-result__forecast" :forecast="forecastData" />
   </div>
 </template>
 
 <script>
 import { ref } from 'vue';
 import { getWeatherIcon, formatTimestamp } from '@/utils';
-import fetchWeatherData from '@/composables/fetchWeatherData.js';
-import WeatherCard from '@/components/weatherCard.vue';
-import ForecastCard from '@/components/forecastCard.vue';
+import fetchWeatherData from '@/composables/fetch-weather-data.js';
+import WeatherCard from '@/components/weather/weather-card.vue';
+import ForecastWrapper from '@/components/forecast/forecast-wrapper.vue';
 
 export default {
-  components: { WeatherCard, ForecastCard },
+  components: { WeatherCard, ForecastWrapper },
   setup() {
-    const { getWeatherByCity } = fetchWeatherData();
+    const { findGeoCoordinates, getCurrentWeatherData, getForecastData } = fetchWeatherData();
 
     let location = ref('');
-    let loaded = ref(false);
-    let valid = ref(false);
+    let loadedData = ref(false);
+    let loadingData = ref(false);
+    let loadingValue = ref(0);
     let weatherData = ref(null);
-    const form = ref(null);
+    let forecastData = ref(null);
 
-    const submit = async () => {
+    let form = ref(null);
+    let valid = ref(false);
+
+    const parsedWeatherData = (data) => {
+      return {
+        location: location.value,
+        icon: getWeatherIcon(data.weather[0].icon),
+        temperature: data.main.temp.toFixed(1),
+        description: data.weather[0].description,
+        sunrise: formatTimestamp(data.sys.sunrise, data.timezone),
+        sunset: formatTimestamp(data.sys.sunset, data.timezone),
+        wind: data.wind.speed,
+        humidity: data.main.humidity,
+        pressure: data.main.pressure,
+        precipitation: data.rain ? data.rain['1h'] || data.rain['3h'] : 0
+      };
+    };
+
+    const searchWeather = async () => {
+      loadedData.value = false;
+      loadingData.value = true;
+      loadingValue.value = 0;
+
       try {
-        const weatherApiData = await getWeatherByCity(location.value);
+        const progressStep = 25;
 
-        weatherData.value = {
-          location: location.value,
-          icon: getWeatherIcon(weatherApiData.weather[0].icon),
-          temperature: weatherApiData.main.temp.toFixed(1),
-          description: weatherApiData.weather[0].description,
-          sunrise: formatTimestamp(weatherApiData.sys.sunrise, weatherApiData.timezone),
-          sunset: formatTimestamp(weatherApiData.sys.sunset, weatherApiData.timezone),
-          wind: weatherApiData.wind.speed,
-          humidity: weatherApiData.main.humidity,
-          pressure: weatherApiData.main.pressure,
-          precipitation: weatherApiData.rain ? weatherApiData.rain['1h'] || weatherApiData.rain['3h'] : '0'
-        };
+        const { country, lat, lon } = await findGeoCoordinates(location.value);
+        loadingValue.value += progressStep;
 
-        loaded.value = true;
-      } catch (err) {
-        loaded.value = false;
-        console.error(err);
-      } finally {
+        const weatherApiData = await getCurrentWeatherData(lat, lon);
+        weatherData.value = { country, ...parsedWeatherData(weatherApiData) };
+        loadingValue.value += 2 * progressStep;
+
+        const forecastApiData = await getForecastData(lat, lon);
+        forecastData.value = forecastApiData.list;
+        loadingValue.value = 100;
+
+        loadingData.value = false;
+        loadedData.value = true;
         form.value.reset();
+      } catch (err) {
+        loadedData.value = false;
+        loadingData.value = false;
+        console.error(err);
       }
     };
 
-    const weatherInputRules = [(v) => !!v || 'Required', (v) => /^[A-Za-z]+$/.test(v) || 'Please enter only lettters'];
-
-    return { form, location, submit, loaded, weatherData, valid, weatherInputRules };
+    return {
+      location,
+      loadedData,
+      loadingData,
+      loadingValue,
+      weatherData,
+      forecastData,
+      form,
+      valid,
+      searchWeather
+    };
   }
 };
 </script>
@@ -105,13 +141,19 @@ export default {
   }
 }
 
+.weather-loader {
+  margin-top: 50px;
+  display: flex;
+  justify-content: center;
+}
+
 .weather-result {
   &__current {
     margin-top: 50px;
   }
 
   &__forecast {
-    margin-top: 50px;
+    margin-top: 30px;
   }
 }
 </style>

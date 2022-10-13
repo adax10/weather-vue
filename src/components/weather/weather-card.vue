@@ -1,19 +1,17 @@
 <template>
   <v-card class="weather-card" elevation="0">
     <v-card-text class="weather-card__date">{{ now }}</v-card-text>
-    <v-card-title class="weather-card__header">{{ weatherData.weather.location }}</v-card-title>
+    <v-card-title class="weather-card__header"
+      >{{ upperFirst(weatherData.weather.location) }}, {{ weatherData.weather.country }}</v-card-title
+    >
 
     <div class="weather-card__content">
-      <div class="weather-card__basics">
-        <div class="weather-card__basics-temperature">
-          <img class="weather-card__basics-temperature-icon" :src="require(`@/assets/${weatherData.weather.icon}.svg`)" />
+      <div class="weather-card__temperature">
+        <img class="weather-card__temperature-icon" :src="require(`@/assets/${weatherData.weather.icon}.svg`)" />
 
-          <p class="weather-card__basics-temperature-text">
-            {{ weatherData.weather.temperature }}<v-icon size="22">mdi-temperature-celsius</v-icon>
-          </p>
-        </div>
-
-        <p class="weather-card__basics-description">{{ weatherData.weather.description }}</p>
+        <p class="weather-card__temperature-text">
+          {{ weatherData.weather.temperature }}<v-icon size="22">mdi-temperature-celsius</v-icon>
+        </p>
       </div>
 
       <div class="weather-card__sun">
@@ -33,6 +31,7 @@
 
 <script setup>
 import moment from 'moment';
+import { upperFirst } from 'lodash';
 
 const weatherData = defineProps(['weather']);
 
@@ -64,26 +63,20 @@ const now = moment(new Date()).format('DD-MM-YYYY, HH:mm');
     justify-content: space-around;
   }
 
-  &__basics {
-    &-temperature {
-      display: flex;
-      margin-top: -20px;
+  &__temperature {
+    display: flex;
+    margin-top: -20px;
 
-      &-icon {
-        width: 100px;
-      }
-
-      &-text {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-weight: 700;
-        font-size: 20px;
-      }
+    &-icon {
+      width: 100px;
     }
 
-    &-description {
-      margin-top: -20px;
+    &-text {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: 700;
+      font-size: 20px;
     }
   }
 }

@@ -25,4 +25,6 @@ const getWeatherIcon = (iconId) => weatherIcons[iconId];
 
 const formatTimestamp = (timestamp, timezone) => moment.utc(timestamp, 'X').add(timezone, 'seconds').format('HH:mm');
 
-export { getWeatherIcon, formatTimestamp };
+const getDayOfTheMonth = (timestamp) => moment(new Date(timestamp * 1000)).format('DD');
+
+export { getWeatherIcon, formatTimestamp, getDayOfTheMonth };
