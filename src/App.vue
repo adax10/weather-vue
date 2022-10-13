@@ -14,15 +14,44 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useTheme } from 'vuetify';
 
 export default {
   setup() {
     const theme = useTheme();
-    let darkMode = ref(false);
+    let darkMode = ref(null);
 
-    const toggleTheme = () => (theme.global.name.value = theme.global.current.value.dark ? 'lightTheme' : 'darkTheme');
+    const setTheme = (mode) => {
+      theme.global.name.value = mode;
+    };
+
+    onMounted(() => {
+      const mode = localStorage.getItem('mode');
+
+      if (mode) {
+        if (mode === 'light') {
+          darkMode.value = false;
+          setTheme('lightTheme');
+        } else {
+          darkMode.value = true;
+          setTheme('darkTheme');
+        }
+      } else {
+        darkMode.value = false;
+        localStorage.setItem('mode', 'light');
+      }
+    });
+
+    const toggleTheme = () => {
+      if ((theme.global.name.value = theme.global.current.value.dark)) {
+        setTheme('lightTheme');
+        localStorage.setItem('mode', 'light');
+      } else {
+        setTheme('darkTheme');
+        localStorage.setItem('mode', 'dark');
+      }
+    };
 
     return { toggleTheme, darkMode };
   }

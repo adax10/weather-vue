@@ -17,8 +17,8 @@ const weatherIcons = {
   '11n': 'thunderstorm',
   '13d': 'snowy',
   '13n': 'snowy',
-  '50d': 'fog',
-  '50n': 'fog'
+  '50d': 'broken-clouds',
+  '50n': 'broken-clouds'
 };
 
 const getWeatherIcon = (iconId) => weatherIcons[iconId];

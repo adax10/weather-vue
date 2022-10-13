@@ -5,9 +5,9 @@ import { createVuetify } from 'vuetify';
 const lightTheme = {
   dark: false,
   colors: {
-    background: '#F5F7FB',
-    primary: '#7001af',
-    secondary: '#9302db',
+    background: '#eee',
+    primary: '#2196F3',
+    secondary: '#03A9F4',
     accent: '#CBCDDA',
     error: '#F46060',
     warning: '#eebb4d',
@@ -20,8 +20,8 @@ const darkTheme = {
   dark: true,
   colors: {
     background: '#1f1f1f',
-    primary: '#9c01ea',
-    secondary: '#9302db',
+    primary: '#2196F3',
+    secondary: '#03A9F4',
     accent: '#CBCDDA',
     error: '#F46060',
     warning: '#eebb4d',
@@ -32,7 +32,6 @@ const darkTheme = {
 
 export default createVuetify({
   theme: {
-    defaultTheme: 'lightTheme',
     themes: {
       lightTheme,
       darkTheme
