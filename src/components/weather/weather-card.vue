@@ -40,12 +40,17 @@ const now = moment(new Date()).format('DD-MM-YYYY, HH:mm');
 
 <style lang="scss" scoped>
 @import 'src/styles/variables';
+@import 'src/styles/mixins/breakpoints.mixins';
 
 .weather-card {
-  width: 1000px;
+  width: 90%;
   margin-left: auto;
   margin-right: auto;
   text-align: center;
+
+  @include respond-to('medium') {
+    width: 1000px;
+  }
 
   &__date {
     padding: 0;
@@ -59,13 +64,17 @@ const now = moment(new Date()).format('DD-MM-YYYY, HH:mm');
   }
 
   &__content {
-    display: flex;
-    justify-content: space-around;
+    @include respond-to('small') {
+      display: flex;
+      justify-content: space-around;
+    }
   }
 
   &__temperature {
     display: flex;
-    margin-top: -20px;
+    margin-top: -30px;
+    justify-content: center;
+    align-items: center;
 
     &-icon {
       width: 100px;
@@ -73,10 +82,17 @@ const now = moment(new Date()).format('DD-MM-YYYY, HH:mm');
 
     &-text {
       display: flex;
-      justify-content: center;
       align-items: center;
       font-weight: 700;
       font-size: 20px;
+    }
+  }
+
+  &__details {
+    margin-top: 20px;
+
+    @include respond-to('small') {
+      margin-top: 0;
     }
   }
 }

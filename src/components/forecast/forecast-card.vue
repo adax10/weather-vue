@@ -12,7 +12,7 @@
 
     <div class="forecast-card__wind">
       <p class="forecast-card__wind-average">Wind: {{ forecast.wind }} km/h</p>
-      <p class="forecast-card__wind-max">Max {{ forecast.maxWind }} km/h</p>
+      <p class="forecast-card__wind-max">Max: {{ forecast.maxWind }} km/h</p>
     </div>
 
     <div class="forecast-card__details">
@@ -28,13 +28,20 @@ const forecastData = defineProps(['forecast']);
 </script>
 
 <style lang="scss" scoped>
+@import 'src/styles/mixins/breakpoints.mixins';
+
 .forecast-card {
-  width: 100%;
+  width: 90%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 0 20px;
   padding: 20px 0;
+  margin: 20px;
+
+  @include respond-to('medium') {
+    width: 100%;
+    margin: 0 20px;
+  }
 
   &__header {
     padding: 0;

@@ -53,13 +53,12 @@ onMounted(() => {
   parsedData.value = parsedForecastData.map((item) => {
     const maxTemperatureItem = maxBy(item.forecast, 'temperature');
     const minTemperatureItem = minBy(item.forecast, 'temperature');
-    const iconItem = item.forecast.find((item) => item.time === '15:00' || item.time === '09:00');
 
     return {
       date: item.date,
       minTemperature: minTemperatureItem.temperature,
       maxTemperature: maxTemperatureItem.temperature,
-      icon: iconItem.icon || maxTemperatureItem.icon,
+      icon: maxTemperatureItem.icon,
       wind: meanBy(item.forecast, 'wind').toFixed(2),
       maxWind: maxBy(item.forecast, 'wind').wind,
       humidity: meanBy(item.forecast, 'humidity').toFixed(0),
@@ -72,10 +71,13 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 @import 'src/styles/variables';
+@import 'src/styles/mixins/breakpoints.mixins';
 
 .forecast-wrapper {
-  display: flex;
-  margin-left: 20px;
-  margin-right: 20px;
+  @include respond-to('medium') {
+    display: flex;
+    margin-left: 20px;
+    margin-right: 20px;
+  }
 }
 </style>

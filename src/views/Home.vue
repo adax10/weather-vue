@@ -1,5 +1,5 @@
 <template>
-  <v-card class="weather-search" rounded outlined elevation="0" width="700">
+  <v-card class="weather-search" rounded outlined elevation="0">
     <v-card-title class="weather-search__header">Search weather</v-card-title>
 
     <v-form ref="form" class="weather-search__form" v-model="valid">
@@ -108,9 +108,15 @@ export default {
 </script>
 
 <style lang="scss">
+@import 'src/styles/mixins/breakpoints.mixins';
+
 .weather-search {
   margin: 0 auto;
-  width: 700px;
+  width: 90%;
+
+  @include respond-to('medium') {
+    width: 700px;
+  }
 
   &__header {
     text-align: center;
@@ -124,8 +130,12 @@ export default {
     }
 
     &-input {
-      width: 50%;
+      width: 100%;
       margin: 0 auto;
+
+      @include respond-to('medium') {
+        width: 50%;
+      }
 
       input,
       .v-messages {
@@ -142,14 +152,22 @@ export default {
 }
 
 .weather-loader {
-  margin-top: 50px;
+  margin-top: 30px;
   display: flex;
   justify-content: center;
+
+  @include respond-to('medium') {
+    margin-top: 50px;
+  }
 }
 
 .weather-result {
   &__current {
-    margin-top: 50px;
+    margin-top: 30px;
+
+    @include respond-to('medium') {
+      margin-top: 50px;
+    }
   }
 
   &__forecast {
