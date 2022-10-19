@@ -1,5 +1,5 @@
 <template>
-  <v-card class="weather-card" elevation="0">
+  <v-card class="weather-card" rounded outlined elevation="1">
     <v-card-text class="weather-card__date">{{ now }}</v-card-text>
     <v-card-title class="weather-card__header"
       >{{ upperFirst(weatherData.weather.location) }}, {{ weatherData.weather.country }}</v-card-title

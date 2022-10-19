@@ -1,18 +1,52 @@
 <template>
-  <div class="forecast-wrapper" elevation="0">
-    <forecast-card v-if="parsedData" :forecast="parsedData" />
+  <div>
+    <div class="forecast-wrapper">
+      <forecast-card
+        v-for="forecast of parsedWeatherForecastData"
+        :key="forecast.date"
+        :forecast="forecast"
+        @toggle-details="showDetails"
+      />
+    </div>
+    <forecast-details v-if="openedDetails" class="forecast-details" :forecast="chartForecastData" />
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, nextTick } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import moment from 'moment';
 import { maxBy, minBy, meanBy } from 'lodash';
 import { getWeatherIcon, getDayOfTheMonth } from '@/utils';
-import ForecastCard from './forecast-card.vue';
+import ForecastCard from '@/components/weather-forecast/weather-forecast-card.vue';
+import forecastDetails from '@/components/weather-forecast/weather-forecast-details.vue';
 
+const router = useRouter();
+const route = useRoute();
 const forecastData = defineProps(['forecast']);
-let parsedData = ref(null);
+
+let allWeatherForecastData = ref(null);
+let parsedWeatherForecastData = ref(null);
+let chartForecastData = ref(null);
+let openedDetails = ref(false);
+
+const showDetails = async (id) => {
+  router.replace({
+    name: route.name,
+    params: { id }
+  });
+
+  if (id) {
+    openedDetails.value = true;
+    chartForecastData.value = findDayForecast(id);
+    await nextTick();
+    document.querySelector('.forecast-details').scrollIntoView({ behavior: 'smooth' });
+  } else {
+    openedDetails.value = false;
+  }
+};
+
+const findDayForecast = (id) => allWeatherForecastData.value.find((item) => item.date === id);
 
 onMounted(() => {
   const filteredList = forecastData.forecast.filter((item) => {
@@ -24,7 +58,7 @@ onMounted(() => {
     }
   });
 
-  const parsedForecastData = filteredList.reduce((result, currentValue) => {
+  allWeatherForecastData.value = filteredList.reduce((result, currentValue) => {
     const date = moment(currentValue.dt_txt).format('DD-MM-YYYY');
 
     const weatherInfo = {
@@ -50,7 +84,7 @@ onMounted(() => {
     return result;
   }, []);
 
-  parsedData.value = parsedForecastData.map((item) => {
+  parsedWeatherForecastData.value = allWeatherForecastData.value.map((item) => {
     const maxTemperatureItem = maxBy(item.forecast, 'temperature');
     const minTemperatureItem = minBy(item.forecast, 'temperature');
 
@@ -78,6 +112,14 @@ onMounted(() => {
     display: flex;
     margin-left: 20px;
     margin-right: 20px;
+  }
+}
+
+.forecast-details {
+  display: none;
+
+  @include respond-to('small') {
+    display: block;
   }
 }
 </style>
